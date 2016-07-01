@@ -19,11 +19,13 @@ import json
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
+    	self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.write('Hello, World! This is 25sprout!')
 
 class ParkInfo(webapp2.RequestHandler):
 	def handleProcedure(self) :
+		self.response.headers['Access-Control-Allow-Origin'] = '*'
 		error = self.request.get("error",'0')
 		data = {}
 		park = {}
@@ -58,6 +60,7 @@ class ParkInfo(webapp2.RequestHandler):
 class AreaList(webapp2.RequestHandler):
 
 	def handleProcedure(self):
+		self.response.headers['Access-Control-Allow-Origin'] = '*'
 		error = self.request.get("error",'0')
 		data = {}
 		area_list = []
@@ -108,6 +111,7 @@ class AreaList(webapp2.RequestHandler):
 
 class AreaInfo(webapp2.RequestHandler):
 	def handleProcedure(self) :
+		self.response.headers['Access-Control-Allow-Origin'] = '*'
 		areaID = self.request.get("area_id",'-1')
 		error = self.request.get("error",'0')
 		data = {}
