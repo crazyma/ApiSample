@@ -14,14 +14,43 @@
 # limitations under the License.
 
 import webapp2
+import urllib
+import urllib2
 import json
-
+import test
+from test import TestUnit
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
     	self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write('Hello, World! This is 25sprout!')
+        test = TestUnit()
+        # str = 'Hello, World! This is 25sprout!'
+        str = test.printXD()
+        self.response.write(str)
+
+class FBTest(webapp2.RequestHandler):
+    def get(self):
+        # url = 'http://myserver/post_service'
+        # data = urllib.urlencode({'name' : 'joe', 'age'  : '10'})
+        # req = urllib2.Request(url, data)
+        # response = urllib2.urlopen(req)
+        # print response.read()
+
+        url = 'https://apisample-ceff0.firebaseio.com/.json'
+        data = urllib.urlencode({'identity' : 'bank'})
+
+        jsonData = {}
+        jsonData['name'] = 'David'
+
+        data = json.dumps(jsonData)
+        req = urllib2.Request(url,data)
+        response = urllib2.urlopen(req)
+
+    	self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Content-Type'] = 'text/plain'
+
+        self.response.write(response.read())
 
 class ParkInfo(webapp2.RequestHandler):
 	def handleProcedure(self) :
@@ -29,11 +58,11 @@ class ParkInfo(webapp2.RequestHandler):
 		error = self.request.get("error",'0')
 		data = {}
 		park = {}
-		
+
 		if int(error) != 1 :
 			data['status'] = True
 			data['error'] = ''
-				
+
 			park['title'] = '新芽動物園'
 			park['description'] = '新芽動物園，這裏什麼都沒有，只有一群熱愛NBA的人 (三小！？)'
 			park['address'] = '我已經建在大都這裏了，想要入園的話就來大都找我吧'
@@ -42,7 +71,7 @@ class ParkInfo(webapp2.RequestHandler):
 		else:
 			data['status'] = False
 			data['error'] = 'Something goes wrong'
-		
+
 
 		data['park'] = park
 
@@ -64,11 +93,11 @@ class AreaList(webapp2.RequestHandler):
 		error = self.request.get("error",'0')
 		data = {}
 		area_list = []
-		
+
 		if int(error) != 1 :
 			data['status'] = True
 			data['error'] = ''
-				
+
 			area1 = {}
 			area1['ID'] = 0
 			area1['title'] = '屍樂園'
@@ -85,7 +114,7 @@ class AreaList(webapp2.RequestHandler):
 			area3['ID'] = 2
 			area3['title'] = '25sprout'
 			area3['description'] = 'sprouters'
-			area3['img'] = 'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/13087318_762220620581596_6311241624767418684_n.jpg?oh=eca7d704c8bfe2ee427a80112f1ece49&oe=57EE2F44'			
+			area3['img'] = 'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/13087318_762220620581596_6311241624767418684_n.jpg?oh=eca7d704c8bfe2ee427a80112f1ece49&oe=57EE2F44'
 
 			area_list.append(area1)
 			area_list.append(area2)
@@ -94,7 +123,7 @@ class AreaList(webapp2.RequestHandler):
 		else:
 			data['status'] = False
 			data['error'] = 'Something goes wrong'
-		
+
 
 		data['area_list'] = area_list
 
@@ -116,7 +145,7 @@ class AreaInfo(webapp2.RequestHandler):
 		error = self.request.get("error",'0')
 		data = {}
 		area = {}
-		
+
 		if int(error) != 1 and int(areaID) >= 0 and int(areaID) <= 2:
 			data['status'] = True
 			data['error'] = ''
@@ -189,10 +218,10 @@ class AreaInfo(webapp2.RequestHandler):
 		else:
 			data['status'] = False
 			if int(areaID) == -1 :
-				data['error'] = 'You have to give area_id'	
+				data['error'] = 'You have to give area_id'
 			else :
 				data['error'] = 'Something goes wrong'
-		
+
 
 		data['area'] = area
 
@@ -213,4 +242,5 @@ app = webapp2.WSGIApplication([
     ('/park_info', ParkInfo),
     ('/area_list', AreaList),
     ('/area_info', AreaInfo),
+    ('/firebase_test', FBTest),
 ], debug=True)
