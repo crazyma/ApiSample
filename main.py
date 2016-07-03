@@ -18,6 +18,7 @@ import urllib
 import urllib2
 import json
 import test
+import ast
 from test import TestUnit
 
 class MainPage(webapp2.RequestHandler):
@@ -28,6 +29,164 @@ class MainPage(webapp2.RequestHandler):
         # str = 'Hello, World! This is 25sprout!'
         str = test.printXD()
         self.response.write(str)
+
+class ParkInfo2(webapp2.RequestHandler):
+    def handleProcedure(self):
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Content-Type'] = 'text/plain'
+
+        error = self.request.get('error','0')
+        responseObject = {}
+
+        if int(error) != 1:
+
+            url = 'https://apisample-ceff0.firebaseio.com/-KLjVgpdU8u7xM0zjbcV.json'
+            # url2 = 'https://apisample-ceff0.firebaseio.com/-KLjZRGROXEwuh-Fmzh8.json'
+            req = urllib2.Request(url)
+            response = urllib2.urlopen(req)
+            responseStr = response.read()
+            responseObject = ast.literal_eval(responseStr)
+            responseObject['status'] = True
+
+        else:
+            responseObject['status'] = False
+            responseObject['error'] = 'Something goes wrong'
+
+        resJsonobject = json.dumps(responseObject)
+        self.response.write(resJsonobject)
+
+    def get(self):
+        self.handleProcedure()
+
+    def post(self):
+        self.handleProcedure()
+
+class AreaList2(webapp2.RequestHandler):
+    def handleProcedure(self):
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Content-Type'] = 'text/plain'
+
+        error = self.request.get('error','0')
+        responseObject = {}
+        if int(error) != 1:
+            url = 'https://apisample-ceff0.firebaseio.com/-KLjZRGROXEwuh-Fmzh8.json'
+            req = urllib2.Request(url)
+            response = urllib2.urlopen(req)
+            responseStr = response.read()
+            responseObject = ast.literal_eval(responseStr)
+            responseObject['status'] = True
+        else:
+            responseObject['status'] = False
+            responseObject['error'] = 'Something goes wrong'
+
+        resJsonObject = json.dumps(responseObject)
+        self.response.write(resJsonObject)
+
+    def get(self):
+        self.handleProcedure()
+
+    def post(self):
+        self.handleProcedure()
+
+class AddFaviCount(webapp2.RequestHandler):
+
+    def handleProcedure(self):
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Content-Type'] = 'text/plain'
+        index = self.request.get('area_id','0')
+
+        url = 'https://apisample-ceff0.firebaseio.com/-KLjZRGROXEwuh-Fmzh8/area_list/' + index + '/.json'
+        req = urllib2.Request(url)
+        response = urllib2.urlopen(req)
+        responseStr = response.read()
+        responseObject = ast.literal_eval(responseStr)
+
+        faviCount = responseObject['faviCount']
+        data = {}
+        data['faviCount'] = faviCount + 1
+        jsonObject = json.dumps(data)
+
+        req2 = urllib2.Request(url,jsonObject)
+        req2.get_method = lambda: 'PATCH'
+        response2 = urllib2.urlopen(req2)
+
+        self.response.write(response2.read())
+
+    def get(self):
+        self.handleProcedure()
+
+    def post(self):
+        self.handleProcedure()
+
+class ZooSetup(webapp2.RequestHandler):
+
+    def setupParkInfo(self):
+        url = 'https://apisample-ceff0.firebaseio.com/.json'
+
+        park = {}
+        park['title'] = '新芽動物園'
+        park['description'] = '新芽動物園，這裏什麼都沒有，只有一群熱愛NBA的人 (三小！？)'
+        park['address'] = '我已經建在大都這裏了，想要入園的話就來大都找我吧'
+        park['tel'] = '你覺得大都會有電話嗎？    當然有：0936-882338'
+        data = {}
+        data['park'] = park
+
+        jsonObject = json.dumps(data)
+        req = urllib2.Request(url,jsonObject)
+        response = urllib2.urlopen(req)
+
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(response.read())
+
+    def setupAreaInfo(self):
+        url = 'https://apisample-ceff0.firebaseio.com/.json'
+
+        area_list = []
+
+        area1 = {}
+        area1['ID'] = 0
+        area1['title'] = '屍樂園'
+        area1['description'] = '一群肚子很餓的傢伙們'
+        area1['img'] = 'http://blogs-images.forbes.com/erikkain/files/2016/02/Amazon-Zombies-1200x801.jpg'
+        area1['faviCount'] = 195
+
+        area2 = {}
+        area2['ID'] = 1
+        area2['title'] = 'Mutant'
+        area2['description'] = '一群身體很變異的傢伙們'
+        area2['img'] = 'http://cdn.worldscreen.com.tw/uploadfile/201505/goods_007905_140502.jpg'
+        area2['faviCount'] = 129
+
+        area3 = {}
+        area3['ID'] = 2
+        area3['title'] = '25sprout'
+        area3['description'] = 'sprouters'
+        area3['img'] = 'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/13087318_762220620581596_6311241624767418684_n.jpg?oh=eca7d704c8bfe2ee427a80112f1ece49&oe=57EE2F44'
+        area3['faviCount'] = 3
+
+        area_list.append(area1)
+        area_list.append(area2)
+        area_list.append(area3)
+
+        data = {}
+        data['area_list'] = area_list
+        jsonObject = json.dumps(data)
+        req = urllib2.Request(url,jsonObject)
+        response = urllib2.urlopen(req)
+
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(response.read())
+
+    def get(self):
+        requestCode = self.request.get("setup",'-1')
+        if int(requestCode) == 0:
+            self.setupParkInfo()
+        elif int(requestCode) == 1:
+            self.setupAreaInfo()
+
+
 
 class FBTest(webapp2.RequestHandler):
     def get(self):
@@ -240,7 +399,11 @@ class AreaInfo(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/park_info', ParkInfo),
+    ('/park_info2', ParkInfo2),
     ('/area_list', AreaList),
+    ('/area_list2', AreaList2),
     ('/area_info', AreaInfo),
     ('/firebase_test', FBTest),
+    ('/zoo_setup', ZooSetup),
+    ('/add_favi_count', AddFaviCount),
 ], debug=True)
