@@ -95,6 +95,39 @@ class AreaList2(webapp2.RequestHandler):
     def post(self):
         self.handleProcedure()
 
+class AreaInfo2(webapp2.RequestHandler):
+
+    def handleProcedure(self):
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Content-Type'] = 'text/plain'
+
+        areaID = self.request.get('area_id','-1')
+        error = self.request.get('error','0')
+
+        responseObject = {}
+        if int(error) != 1 and int(areaID) >= 0 and int(areaID) <=2 :
+             url = 'https://apisample-ceff0.firebaseio.com/-KLk1z889Wgiw4IhPFb2/area_list/' + areaID + '/.json'
+             req = urllib2.Request(url)
+             response = urllib2.urlopen(req)
+             responseStr = response.read()
+
+             areaData = ast.literal_eval(responseStr)
+             responseObject['area'] = areaData
+             responseObject['status'] = True
+        else:
+            responseObject['status'] = False
+            responseObject['error'] = 'Something goes wrong'
+
+        resJsonObject = json.dumps(responseObject)
+        self.response.write(resJsonObject)
+
+
+    def get(self):
+        self.handleProcedure()
+
+    def post(self):
+        self.handleProcedure()
+
 class AddFaviCount(webapp2.RequestHandler):
 
     def handleProcedure(self):
@@ -104,7 +137,7 @@ class AddFaviCount(webapp2.RequestHandler):
 
         responseObject = {}
         if int(index) >=0 and int(index) <= 2:
-            url = 'https://apisample-ceff0.firebaseio.com/-KLjZRGROXEwuh-Fmzh8/area_list/' + index + '/.json'
+            url = 'https://apisample-ceff0.firebaseio.com/-KLk1z889Wgiw4IhPFb2/area_list/' + index + '/.json'
             req = urllib2.Request(url)
             response = urllib2.urlopen(req)
             responseStr = response.read()
@@ -473,7 +506,8 @@ app = webapp2.WSGIApplication([
     ('/park_info', ParkInfo2),
     ('/area_list_old', AreaList),
     ('/area_list', AreaList2),
-    ('/area_info', AreaInfo),
+    ('/area_info_old', AreaInfo),
+    ('/area_info', AreaInfo2),
     ('/firebase_test', FBTest),
     ('/zoo_setup', ZooSetup),
     ('/add_favi_count', AddFaviCount),
