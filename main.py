@@ -93,24 +93,33 @@ class AddFaviCount(webapp2.RequestHandler):
     def handleProcedure(self):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Content-Type'] = 'text/plain'
-        index = self.request.get('area_id','0')
+        index = self.request.get('area_id','-1')
 
-        url = 'https://apisample-ceff0.firebaseio.com/-KLjZRGROXEwuh-Fmzh8/area_list/' + index + '/.json'
-        req = urllib2.Request(url)
-        response = urllib2.urlopen(req)
-        responseStr = response.read()
-        responseObject = ast.literal_eval(responseStr)
+        responseObject = {}
+        if int(index) >=0 and int(index) <= 2:
+            url = 'https://apisample-ceff0.firebaseio.com/-KLjZRGROXEwuh-Fmzh8/area_list/' + index + '/.json'
+            req = urllib2.Request(url)
+            response = urllib2.urlopen(req)
+            responseStr = response.read()
+            responseObject = ast.literal_eval(responseStr)
 
-        faviCount = responseObject['faviCount']
-        data = {}
-        data['faviCount'] = faviCount + 1
-        jsonObject = json.dumps(data)
+            faviCount = responseObject['faviCount']
+            data = {}
+            data['faviCount'] = faviCount + 1
+            jsonObject = json.dumps(data)
 
-        req2 = urllib2.Request(url,jsonObject)
-        req2.get_method = lambda: 'PATCH'
-        response2 = urllib2.urlopen(req2)
+            req2 = urllib2.Request(url,jsonObject)
+            req2.get_method = lambda: 'PATCH'
+            response2 = urllib2.urlopen(req2)
+            responseStr2 = response2.read()
+            responseObject = ast.literal_eval(responseStr2)
+            responseObject['status'] = True
+        else:
+            responseObject['status'] = False
+            responseObject['error'] = 'Something goes wrong'
 
-        self.response.write(response2.read())
+        resJsonObject = json.dumps(responseObject)
+        self.response.write(resJsonObject)
 
     def get(self):
         self.handleProcedure()
