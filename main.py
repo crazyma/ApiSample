@@ -62,6 +62,7 @@ class ParkInfo2(webapp2.RequestHandler):
         self.handleProcedure()
 
 class AreaList2(webapp2.RequestHandler):
+
     def handleProcedure(self):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Content-Type'] = 'text/plain'
@@ -69,12 +70,18 @@ class AreaList2(webapp2.RequestHandler):
         error = self.request.get('error','0')
         responseObject = {}
         if int(error) != 1:
-            url = 'https://apisample-ceff0.firebaseio.com/-KLjZRGROXEwuh-Fmzh8.json'
+            url = 'https://apisample-ceff0.firebaseio.com/-KLk1z889Wgiw4IhPFb2.json'
             req = urllib2.Request(url)
             response = urllib2.urlopen(req)
             responseStr = response.read()
             responseObject = ast.literal_eval(responseStr)
             responseObject['status'] = True
+
+            # remove animals list to reduce the size of response
+            for i in range(0, 3, 1):
+                aa = responseObject['area_list'][i]
+                del aa['animals_list']
+
         else:
             responseObject['status'] = False
             responseObject['error'] = 'Something goes wrong'
@@ -129,6 +136,58 @@ class AddFaviCount(webapp2.RequestHandler):
 
 class ZooSetup(webapp2.RequestHandler):
 
+    def getAnimals(self,areaID):
+        animalsList = []
+        if areaID == 0 :
+            animal1 = {}
+            animal1['ID'] = 0
+            animal1['title'] = 'Weaking Dead'
+            animal1['img'] = 'http://thebloodtheatre.com/wp-content/uploads/2013/02/the-walking-dead-3-the-walking-dead-24037474-500-333.jpg'
+
+            animal2 = {}
+            animal2['ID'] = 1
+            animal2['title'] = 'Resident Evil'
+            animal2['img'] = 'http://pic.pimg.tw/joeman/2399cfa5cab4aa78e8a56de98e939e88.jpg'
+
+            animal3 = {}
+            animal3['ID'] = 2
+            animal3['title'] = 'World War Z'
+            animal3['img'] = 'http://link.photo.pchome.com.tw/s13/hatsocks75/851/137195529019/'
+
+            animalsList.append(animal1)
+            animalsList.append(animal2)
+            animalsList.append(animal3)
+        elif areaID == 1:
+
+            animal1 = {}
+            animal1['ID'] = 10
+            animal1['title'] = 'Magneto'
+            animal1['img'] = 'http://vignette2.wikia.nocookie.net/marvelmovies/images/6/65/Magneto_-_Past.png/revision/latest?cb=20140219112937'
+
+            animal2 = {}
+            animal2['ID'] = 11
+            animal2['title'] = 'Professor x'
+            animal2['img'] = 'http://vignette4.wikia.nocookie.net/shipping/images/8/8c/~X-Men_$Charles_Xavier_*1.png/revision/latest?cb=20140531084805'
+
+            animalsList.append(animal1)
+            animalsList.append(animal2)
+        elif areaID == 2 :
+
+            animal1 = {}
+            animal1['ID'] = 20
+            animal1['title'] = 'Alex'
+            animal1['img'] = 'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/13124514_10153601676569677_2131607325507427168_n.jpg?oh=99b3e30c8279536fb0af2cd946a71475&oe=58345ED0'
+
+            animal2 = {}
+            animal2['ID'] = 21
+            animal2['title'] = 'Thundersha'
+            animal2['img'] = 'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/12043051_10201501767903884_3444857786651760104_n.jpg?oh=afece1b2ce0e40661b2069eb4cdc0a70&oe=57ED3AAF'
+
+            animalsList.append(animal1)
+            animalsList.append(animal2)
+
+        return animalsList
+
     def setupParkInfo(self):
         url = 'https://apisample-ceff0.firebaseio.com/.json'
 
@@ -159,6 +218,7 @@ class ZooSetup(webapp2.RequestHandler):
         area1['description'] = '一群肚子很餓的傢伙們'
         area1['img'] = 'http://blogs-images.forbes.com/erikkain/files/2016/02/Amazon-Zombies-1200x801.jpg'
         area1['faviCount'] = 195
+        area1['animals_list'] = self.getAnimals(0)
 
         area2 = {}
         area2['ID'] = 1
@@ -166,6 +226,7 @@ class ZooSetup(webapp2.RequestHandler):
         area2['description'] = '一群身體很變異的傢伙們'
         area2['img'] = 'http://cdn.worldscreen.com.tw/uploadfile/201505/goods_007905_140502.jpg'
         area2['faviCount'] = 129
+        area2['animals_list'] = self.getAnimals(1)
 
         area3 = {}
         area3['ID'] = 2
@@ -173,6 +234,7 @@ class ZooSetup(webapp2.RequestHandler):
         area3['description'] = 'sprouters'
         area3['img'] = 'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/13087318_762220620581596_6311241624767418684_n.jpg?oh=eca7d704c8bfe2ee427a80112f1ece49&oe=57EE2F44'
         area3['faviCount'] = 3
+        area3['animals_list'] = self.getAnimals(2)
 
         area_list.append(area1)
         area_list.append(area2)
@@ -407,10 +469,10 @@ class AreaInfo(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/park_info', ParkInfo),
-    ('/park_info2', ParkInfo2),
-    ('/area_list', AreaList),
-    ('/area_list2', AreaList2),
+    ('/park_info_old', ParkInfo),
+    ('/park_info', ParkInfo2),
+    ('/area_list_old', AreaList),
+    ('/area_list', AreaList2),
     ('/area_info', AreaInfo),
     ('/firebase_test', FBTest),
     ('/zoo_setup', ZooSetup),
