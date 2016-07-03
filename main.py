@@ -30,7 +30,7 @@ class MainPage(webapp2.RequestHandler):
         str = test.printXD()
         self.response.write(str)
 
-class ParkInfo2(webapp2.RequestHandler):
+class ParkInfo(webapp2.RequestHandler):
     def handleProcedure(self):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Content-Type'] = 'text/plain'
@@ -41,7 +41,6 @@ class ParkInfo2(webapp2.RequestHandler):
         if int(error) != 1:
 
             url = 'https://apisample-ceff0.firebaseio.com/-KLjVgpdU8u7xM0zjbcV.json'
-            # url2 = 'https://apisample-ceff0.firebaseio.com/-KLjZRGROXEwuh-Fmzh8.json'
             req = urllib2.Request(url)
             response = urllib2.urlopen(req)
             responseStr = response.read()
@@ -61,7 +60,7 @@ class ParkInfo2(webapp2.RequestHandler):
     def post(self):
         self.handleProcedure()
 
-class AreaList2(webapp2.RequestHandler):
+class AreaList(webapp2.RequestHandler):
 
     def handleProcedure(self):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
@@ -95,7 +94,7 @@ class AreaList2(webapp2.RequestHandler):
     def post(self):
         self.handleProcedure()
 
-class AreaInfo2(webapp2.RequestHandler):
+class AreaInfo(webapp2.RequestHandler):
 
     def handleProcedure(self):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
@@ -290,118 +289,7 @@ class ZooSetup(webapp2.RequestHandler):
         elif int(requestCode) == 1:
             self.setupAreaInfo()
 
-
-
-class FBTest(webapp2.RequestHandler):
-    def get(self):
-        # url = 'http://myserver/post_service'
-        # data = urllib.urlencode({'name' : 'joe', 'age'  : '10'})
-        # req = urllib2.Request(url, data)
-        # response = urllib2.urlopen(req)
-        # print response.read()
-
-        url = 'https://apisample-ceff0.firebaseio.com/.json'
-        data = urllib.urlencode({'identity' : 'bank'})
-
-        jsonData = {}
-        jsonData['name'] = 'David'
-
-        data = json.dumps(jsonData)
-        req = urllib2.Request(url,data)
-        response = urllib2.urlopen(req)
-
-    	self.response.headers['Access-Control-Allow-Origin'] = '*'
-        self.response.headers['Content-Type'] = 'text/plain'
-
-        self.response.write(response.read())
-
-class ParkInfo(webapp2.RequestHandler):
-	def handleProcedure(self) :
-		self.response.headers['Access-Control-Allow-Origin'] = '*'
-		error = self.request.get("error",'0')
-		data = {}
-		park = {}
-
-		if int(error) != 1 :
-			data['status'] = True
-			data['error'] = ''
-
-			park['title'] = '新芽動物園'
-			park['description'] = '新芽動物園，這裏什麼都沒有，只有一群熱愛NBA的人 (三小！？)'
-			park['address'] = '我已經建在大都這裏了，想要入園的話就來大都找我吧'
-			park['tel'] = '你覺得大都會有電話嗎？    當然有：0936-882338'
-
-		else:
-			data['status'] = False
-			data['error'] = 'Something goes wrong'
-
-
-		data['park'] = park
-
-		json_data = json.dumps(data)
-
-		self.response.headers['Content-Type'] = 'text/plain'
-		self.response.write(json_data)
-
-	def post(self):
-		self.handleProcedure()
-
-	def get(self) :
-		self.handleProcedure()
-
-class AreaList(webapp2.RequestHandler):
-
-	def handleProcedure(self):
-		self.response.headers['Access-Control-Allow-Origin'] = '*'
-		error = self.request.get("error",'0')
-		data = {}
-		area_list = []
-
-		if int(error) != 1 :
-			data['status'] = True
-			data['error'] = ''
-
-			area1 = {}
-			area1['ID'] = 0
-			area1['title'] = '屍樂園'
-			area1['description'] = '一群肚子很餓的傢伙們'
-			area1['img'] = 'http://blogs-images.forbes.com/erikkain/files/2016/02/Amazon-Zombies-1200x801.jpg'
-
-			area2 = {}
-			area2['ID'] = 1
-			area2['title'] = 'Mutant'
-			area2['description'] = '一群身體很變異的傢伙們'
-			area2['img'] = 'http://cdn.worldscreen.com.tw/uploadfile/201505/goods_007905_140502.jpg'
-
-			area3 = {}
-			area3['ID'] = 2
-			area3['title'] = '25sprout'
-			area3['description'] = 'sprouters'
-			area3['img'] = 'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/13087318_762220620581596_6311241624767418684_n.jpg?oh=eca7d704c8bfe2ee427a80112f1ece49&oe=57EE2F44'
-
-			area_list.append(area1)
-			area_list.append(area2)
-			area_list.append(area3)
-
-		else:
-			data['status'] = False
-			data['error'] = 'Something goes wrong'
-
-
-		data['area_list'] = area_list
-
-		json_data = json.dumps(data)
-
-		self.response.headers['Content-Type'] = 'text/plain'
-		self.response.write(json_data)
-
-	def post(self):
-		self.handleProcedure()
-
-	def get(self) :
-		self.handleProcedure()
-
-class AreaInfo(webapp2.RequestHandler):
+class AreaInfo_OLD(webapp2.RequestHandler):
 	def handleProcedure(self) :
 		self.response.headers['Access-Control-Allow-Origin'] = '*'
 		areaID = self.request.get("area_id",'-1')
@@ -502,13 +390,9 @@ class AreaInfo(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/park_info_old', ParkInfo),
-    ('/park_info', ParkInfo2),
-    ('/area_list_old', AreaList),
-    ('/area_list', AreaList2),
-    ('/area_info_old', AreaInfo),
-    ('/area_info', AreaInfo2),
-    ('/firebase_test', FBTest),
+    ('/park_info', ParkInfo),
+    ('/area_list', AreaList),
+    ('/area_info', AreaInfo),
     ('/zoo_setup', ZooSetup),
     ('/add_favi_count', AddFaviCount),
 ], debug=True)
